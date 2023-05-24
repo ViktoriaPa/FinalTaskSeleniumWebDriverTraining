@@ -6,13 +6,15 @@ import org.openqa.selenium.support.FindBy;
 
 public class CartPage extends BasePage{
     @FindBy(xpath = "//tr[@class='totals sub'] //span[@class='price']")
-    public WebElement totalPrice;
+    private WebElement totalPrice;
     public CartPage(WebDriver driver) {
         super(driver);
     }
-
+    public String getTotalPrice(){
+        return totalPrice.getText();
+    }
     public float getTotalPriceFromCart() {
-        String totalProductsPrice = totalPrice.getText();
+        String totalProductsPrice = getTotalPrice();
         float productsPrice = Float.parseFloat(totalProductsPrice.replaceAll("[$]", ""));
 
         return productsPrice;

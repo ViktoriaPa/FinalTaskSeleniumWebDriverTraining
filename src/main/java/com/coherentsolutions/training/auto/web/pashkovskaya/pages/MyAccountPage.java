@@ -6,13 +6,15 @@ import org.openqa.selenium.support.FindBy;
 
 public class MyAccountPage extends BasePage{
     @FindBy(linkText = "Address Book")
-    public WebElement addressBookPage;
+    private WebElement addressBookPage;
     public MyAccountPage(WebDriver driver) {
         super(driver);
     }
-
-    public AddressBookPage openAddressBookPage() {
+    public void clickAddressBookLink(){
         addressBookPage.click();
+    }
+    public AddressBookPage openAddressBookPage() {
+        clickAddressBookLink();
 
         return new AddressBookPage(driver);
     }

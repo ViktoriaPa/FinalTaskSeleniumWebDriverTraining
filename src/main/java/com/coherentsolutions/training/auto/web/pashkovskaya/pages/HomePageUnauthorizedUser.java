@@ -6,22 +6,27 @@ import org.openqa.selenium.support.FindBy;
 
 public class HomePageUnauthorizedUser extends BasePage{
     @FindBy(linkText = "Sign In")
-    public WebElement signInLink;
+    private WebElement signInLink;
     @FindBy(linkText = "Create an Account")
-    public WebElement createAccountLink;
+    private WebElement createAccountLink;
 
     public HomePageUnauthorizedUser(WebDriver driver) {
         super(driver);
     }
-
-    public AuthorizationPage openAuthorizationPage() {
+    public void clickSignInLink(){
         signInLink.click();
+    }
+    public void clickCreateAccountLink(){
+        createAccountLink.click();
+    }
+    public AuthorizationPage openAuthorizationPage() {
+        clickSignInLink();
 
         return new AuthorizationPage(driver);
     }
 
     public AccountCreationPage openAccountCreationPage() {
-        createAccountLink.click();
+        clickCreateAccountLink();
 
         return new AccountCreationPage(driver);
     }

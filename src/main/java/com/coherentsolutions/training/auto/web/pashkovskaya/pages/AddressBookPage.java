@@ -5,16 +5,17 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 public class AddressBookPage extends BasePage{
-    @FindBy(xpath = "//button[@class='action primary add']")
-    public WebElement addNewAddressButton;
+    @FindBy(xpath = "//button[@role='add-address']")
+    private WebElement addNewAddressButton;
 
     public AddressBookPage(WebDriver driver) {
         super(driver);
     }
-
-    public AddNewAddressPage openAddNewAddressPage() throws InterruptedException {
-        Thread.sleep(10000);
+    public void clickAddNewAddressButton(){
         addNewAddressButton.click();
+    }
+    public AddNewAddressPage openAddNewAddressPage() throws InterruptedException {
+        clickAddNewAddressButton();
 
         return new AddNewAddressPage(driver);
     }

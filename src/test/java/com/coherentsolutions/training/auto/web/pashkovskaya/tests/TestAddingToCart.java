@@ -20,9 +20,8 @@ public class TestAddingToCart extends BaseTest {
         HomePageUnauthorizedUser homePageUnauthorizedUser = new HomePageUnauthorizedUser(driver);
         AuthorizationPage authorizationPage = homePageUnauthorizedUser.openAuthorizationPage();
         HomePageAuthorizedUser homePageAuthorizedUser = authorizationPage.openHomePageAuthorizedUser(EMAIL, PASSWORD);
-        WomenClothesPage womenClothesPage = homePageAuthorizedUser.openWomenClothesPage();
-        Float totalPriceAddedToChartProducts = womenClothesPage.addThreeProductsToCart();
-        CartPage cartPage = womenClothesPage.openCartPage();
+        Float totalPriceAddedToChartProducts = homePageAuthorizedUser.addThreeProductsToCart();
+        CartPage cartPage = homePageAuthorizedUser.openCartPage();
 
         assertEquals(totalPriceAddedToChartProducts, cartPage.getTotalPriceFromCart(), "Prices mismatch");
     }

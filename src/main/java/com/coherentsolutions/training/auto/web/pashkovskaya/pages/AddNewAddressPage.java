@@ -4,40 +4,74 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import java.util.concurrent.TimeUnit;
+
 public class AddNewAddressPage extends BasePage{
     @FindBy(id = "street_1")
-    public WebElement addressTextField1;
+    private WebElement addressTextField1;
     @FindBy(id = "city")
-    public WebElement cityTextField;
+    private WebElement cityTextField;
     @FindBy(id = "country")
-    public WebElement countryDropdown;
+    private WebElement countryDropdown;
     @FindBy(xpath = "//*[@id='country']/option[178]")
-    public WebElement country;
+    private WebElement country;
     @FindBy(id = "region_id")
-    public WebElement stateDropdown;
+    private WebElement stateDropdown;
     @FindBy(xpath = "//*[@id='region_id']/option[2]")
-    public WebElement state;
+    private WebElement state;
     @FindBy(id = "zip")
-    public WebElement zipTextField;
+    private WebElement zipTextField;
     @FindBy(id = "telephone")
-    public WebElement phoneNumberTextField;
-    @FindBy(xpath = "//button[@class = 'action save primary']")
-    public WebElement saveAddressButton;
+    private WebElement phoneNumberTextField;
+    @FindBy(xpath = "//button[@data-action='save-address']")
+    private WebElement saveAddressButton;
+    @FindBy(xpath = "//div[@data-ui-id='message-success']")
+    private WebElement addressSavedSuccessfullyMessage;
 
     public AddNewAddressPage(WebDriver driver) {
         super(driver);
     }
-
-    public AddressBookPage saveNewAddress(String address, String city, String zip, String phoneNumber) {
+    public String getAddressSavedSuccessfullyMessage(){
+        return addressSavedSuccessfullyMessage.getText();
+    }
+    public void enterAddress(String address){
         addressTextField1.sendKeys(address);
+    }
+    public void enterCity(String city){
         cityTextField.sendKeys(city);
+    }
+    public void openCountryDropdown(){
         countryDropdown.click();
+    }
+    public void selectCountry(){
         country.click();
+    }
+    public void openStateDropdown(){
         stateDropdown.click();
+    }
+    public void selectState(){
         state.click();
+    }
+    public void enterZip(String zip){
         zipTextField.sendKeys(zip);
+    }
+    public void enterPhoneNumber(String phoneNumber){
         phoneNumberTextField.sendKeys(phoneNumber);
+    }
+    public void clickSaveAddressButton(){
         saveAddressButton.click();
+    }
+    public AddressBookPage saveNewAddress(String address, String city, String zip, String phoneNumber) {
+        enterAddress(address);
+        enterCity(city);
+        openCountryDropdown();
+        selectCountry();
+        openStateDropdown();
+        selectState();
+        enterZip(zip);
+        enterPhoneNumber(phoneNumber);
+        clickSaveAddressButton();
+        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 
         return new AddressBookPage(driver);
     }
