@@ -1,6 +1,7 @@
 package com.coherentsolutions.training.auto.web.pashkovskaya.pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -8,7 +9,9 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.math.BigDecimal;
 import java.time.Duration;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class HomePageAuthorizedUser extends BasePage{
@@ -18,8 +21,8 @@ public class HomePageAuthorizedUser extends BasePage{
     private WebElement myAccountPage;
     @FindBy(xpath = "//div[@class='panel header'] //span[contains(text(), 'Viktoria Pa')]")
     private WebElement loggedInUserLabel;
-    @FindBy(xpath = "//*[@id='maincontent']/div[3]/div/div[2]/div[3]/div/div/ol/li[1]")
-    private WebElement productItem;
+    @FindBy(xpath = "//div[@class='block-content'] //li[@class='product-item'][1]")
+    private WebElement firstProductItemFromHotSellersSection;
     @FindBy(xpath = "//a[@class='action showcart']")
     private WebElement cartIcon;
     @FindBy(xpath = "//a[@class='action viewcart']")
@@ -28,6 +31,21 @@ public class HomePageAuthorizedUser extends BasePage{
     private WebElement counterOfAddedToCartItems;
     @FindBy(xpath = "//a[@data-action='add-to-wishlist'][1]")
     private WebElement addToWishListIcon;
+    @FindBy(xpath = "//ul[@id='ui-id-2'] //span[text()='Women']")
+    private WebElement womenCategory;
+    @FindBy(xpath = "//a[@id='ui-id-9'] //span[text()='Tops']")
+    private WebElement topsSubCategoryOfWomenCategory;
+    @FindBy(xpath = "//a[@id='ui-id-10'] //span[text()='Bottoms']")
+    private WebElement bottomsSubCategoryOfWomenCategory;
+    @FindBy(xpath = "//div[@class='columns']//div[contains(@class,'products-grid')]//li")
+    private List<WebElement> listOfProducts;
+
+    private By nextButton = By.xpath("//div[@class='column main'] //div[4] //a[@title='Next']");
+    private By firstAvailableProductSize = By.xpath(".//div[@attribute-code='size']//div//div[1]");
+    private By firstAvailableProductColor = By.xpath(".//div[@attribute-code='color']/div/div[1]");
+    private By productName = By.xpath(".//a[@class='product-item-link']");
+    private By productPrice = By.xpath(".//span[@data-price-type='finalPrice']");
+    private By addToCartButton = By.xpath(".//button[@title='Add to Cart']");
 
     public HomePageAuthorizedUser(WebDriver driver) {
         super(driver);
@@ -43,7 +61,38 @@ public class HomePageAuthorizedUser extends BasePage{
         myAccountPage.click();
     }
     public void selectItem(){
-        productItem.click();
+        firstProductItemFromHotSellersSection.click();
+    }
+    public void navigateToWomenCategory(){
+        Actions action = new Actions(driver);
+        action.moveToElement(womenCategory).perform();
+    }
+    public void navigateToTopsSubCategoryOfWomenCategory(){
+        topsSubCategoryOfWomenCategory.click();
+    }
+    public void navigateToBottomsSubCategoryOfWomenCategory(){
+        bottomsSubCategoryOfWomenCategory.click();
+    }
+    public List<WebElement> getListOfProducts(){
+        return listOfProducts;
+    }
+    public String getProductName(WebElement productElement){
+        return productElement.findElement(productName).getText();
+    }
+    public void selectFirstAvailableProductSize(WebElement productElement){
+        productElement.findElement(firstAvailableProductSize).click();
+    }
+    public void selectFirstAvailableProductColor(WebElement productElement){
+        productElement.findElement(firstAvailableProductColor).click();
+    }
+    public BigDecimal getProductPrice(WebElement productElement){
+        String price = productElement.findElement(productPrice).getText();
+
+        BigDecimal productPrice = new BigDecimal(price.replaceAll("[$]", ""));
+        return productPrice;
+    }
+    public void addProductToCart(WebElement productElement){
+        productElement.findElement(addToCartButton).click();
     }
     public void clickCartIcon(){
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
@@ -54,36 +103,46 @@ public class HomePageAuthorizedUser extends BasePage{
     public void clickCartLink(){
         cartLink.click();
     }
-    public float addThreeProductsToCart() {
-        float totalPrice=0;
-        for (int i = 1; i < 4; i++){
-            driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
-            driver.findElement(By.xpath("//ol[@class='product-items widget-product-grid'] //li[" + i + "]"));
+    public BigDecimal addProductToCartFromWomenCategory(String product, String subCategory) {
+        navigateToWomenCategory();
 
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
-            wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//ol[@class='product-items widget-product-grid'] //li[" + i + "] //span[@class='price']")));
-
-            String price = driver.findElement(By.xpath("//ol[@class='product-items widget-product-grid'] //li[" + i + "] //span[@class='price']")).getText();
-            float productPrice = Float.parseFloat(price.replaceAll("[$]", ""));
-            WebElement size = driver.findElement(By.xpath("//ol[@class='product-items widget-product-grid'] //li[" + i + "] //div[@aria-label='Size']/div[1]"));
-            size.click();
-            WebElement color = driver.findElement(By.xpath("//ol[@class='product-items widget-product-grid'] //li[" + i + "] //div[@aria-label='Color']/div[1]"));
-            color.click();
-            WebElement addToCartButton = driver.findElement(By.xpath("//ol[@class='product-items widget-product-grid'] //li[" + i + "] //button[@title='Add to Cart']"));
-            addToCartButton.click();
-            driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-
-            totalPrice = totalPrice + productPrice;
+        if(subCategory.equals("Tops")){
+            navigateToTopsSubCategoryOfWomenCategory();
+        } else if (subCategory.equals("Bottoms")) {
+            navigateToBottomsSubCategoryOfWomenCategory();
         }
 
-        return(totalPrice);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        BigDecimal totalPrice = BigDecimal.ZERO;
+
+        while (true) {
+            try {
+                List<WebElement> productList = getListOfProducts();
+                for (WebElement productElement : productList) {
+                    if (getProductName(productElement).equals(product)) {
+                        selectFirstAvailableProductSize(productElement);
+                        selectFirstAvailableProductColor(productElement);
+
+                        totalPrice = totalPrice.add(getProductPrice(productElement));
+
+                        addProductToCart(productElement);
+                    }
+                }
+                WebElement nextButtonForTable = wait.until(ExpectedConditions.presenceOfElementLocated(nextButton));
+                nextButtonForTable.click();
+                driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+            } catch (TimeoutException e) {
+                break;
+            }
+        }
+        return totalPrice;
     }
     public void addToWishList(){
         addToWishListIcon.click();
     }
     public WishListPage openWishListPage(){
         Actions action = new Actions(driver);
-        action.moveToElement(productItem).perform();
+        action.moveToElement(firstProductItemFromHotSellersSection).perform();
 
         addToWishList();
 
@@ -100,12 +159,9 @@ public class HomePageAuthorizedUser extends BasePage{
 
         return new CartPage(driver);
     }
-
     public MyAccountPage openMyAccountPage() {
-        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
         clickLoggedInButton();
         clickMyAccountLink();
-        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 
         return new MyAccountPage(driver);
     }

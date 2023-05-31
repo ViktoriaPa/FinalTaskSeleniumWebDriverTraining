@@ -14,7 +14,7 @@ public class AddressBookPage extends BasePage{
     public void clickAddNewAddressButton(){
         addNewAddressButton.click();
     }
-    public AddNewAddressPage openAddNewAddressPage() throws InterruptedException {
+    public AddNewAddressPage openAddNewAddressPage() {
         clickAddNewAddressButton();
 
         return new AddNewAddressPage(driver);

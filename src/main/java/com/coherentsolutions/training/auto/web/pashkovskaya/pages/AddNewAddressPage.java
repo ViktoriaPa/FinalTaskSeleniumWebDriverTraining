@@ -4,8 +4,6 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-import java.util.concurrent.TimeUnit;
-
 public class AddNewAddressPage extends BasePage{
     @FindBy(id = "street_1")
     private WebElement addressTextField1;
@@ -71,7 +69,6 @@ public class AddNewAddressPage extends BasePage{
         enterZip(zip);
         enterPhoneNumber(phoneNumber);
         clickSaveAddressButton();
-        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
 
         return new AddressBookPage(driver);
     }

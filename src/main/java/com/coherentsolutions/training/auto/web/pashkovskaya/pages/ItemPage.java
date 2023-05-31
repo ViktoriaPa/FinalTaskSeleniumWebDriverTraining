@@ -11,7 +11,7 @@ public class ItemPage extends BasePage{
     private WebElement colorLabel;
     @FindBy(id = "product-addtocart-button")
     private WebElement addToCartLink;
-    @FindBy(xpath = "//*[@id='maincontent']/div[3]/div/div[2]/div[3]/div/div/ol/li[1]/div/div/div[4]/div/div[2]/a[1]")
+    @FindBy(xpath = "//div[@class='product-social-links'] //a[@data-action='add-to-wishlist']")
     private WebElement addToWishListLink;
 
     public ItemPage(WebDriver driver) {

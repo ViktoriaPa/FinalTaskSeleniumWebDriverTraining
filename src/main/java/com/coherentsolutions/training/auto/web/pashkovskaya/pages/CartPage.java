@@ -4,6 +4,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
+import java.math.BigDecimal;
+
 public class CartPage extends BasePage{
     @FindBy(xpath = "//tr[@class='totals sub'] //span[@class='price']")
     private WebElement totalPrice;
@@ -13,9 +15,9 @@ public class CartPage extends BasePage{
     public String getTotalPrice(){
         return totalPrice.getText();
     }
-    public float getTotalPriceFromCart() {
+    public BigDecimal getTotalPriceFromCart() {
         String totalProductsPrice = getTotalPrice();
-        float productsPrice = Float.parseFloat(totalProductsPrice.replaceAll("[$]", ""));
+        BigDecimal productsPrice = new BigDecimal(totalProductsPrice.replaceAll("[$]", ""));
 
         return productsPrice;
     }
