@@ -1,9 +1,6 @@
 package com.coherentsolutions.training.auto.web.pashkovskaya.pages;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -15,6 +12,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class HomePageAuthorizedUser extends BasePage{
+    private static final String CATEGORY_XPATH_TEMPLATE = "//span[text()='%s']";
+    private static final String SUB_CATEGORY_XPATH_TEMPLATE = "//ul[@id='ui-id-2']//a[span[contains(text(),'%s')]]/following-sibling::ul//a[span[contains(text(),'%s')]]";
     @FindBy(xpath = "//div[@class='panel header'] //button[@data-action='customer-menu-toggle']")
     private WebElement loggedInUserMenu;
     @FindBy(linkText = "My Account")
@@ -31,12 +30,6 @@ public class HomePageAuthorizedUser extends BasePage{
     private WebElement counterOfAddedToCartItems;
     @FindBy(xpath = "//a[@data-action='add-to-wishlist'][1]")
     private WebElement addToWishListIcon;
-    @FindBy(xpath = "//ul[@id='ui-id-2'] //span[text()='Women']")
-    private WebElement womenCategory;
-    @FindBy(xpath = "//a[@id='ui-id-9'] //span[text()='Tops']")
-    private WebElement topsSubCategoryOfWomenCategory;
-    @FindBy(xpath = "//a[@id='ui-id-10'] //span[text()='Bottoms']")
-    private WebElement bottomsSubCategoryOfWomenCategory;
     @FindBy(xpath = "//div[@class='columns']//div[contains(@class,'products-grid')]//li")
     private List<WebElement> listOfProducts;
 
@@ -63,15 +56,15 @@ public class HomePageAuthorizedUser extends BasePage{
     public void selectItem(){
         firstProductItemFromHotSellersSection.click();
     }
-    public void navigateToWomenCategory(){
+    public void navigateToSubCategory(String categoryName, String subcategoryName){
+        String subCategoryXPath = String.format(SUB_CATEGORY_XPATH_TEMPLATE, categoryName, subcategoryName);
+        WebElement subCategoryElement = driver.findElement(By.xpath(subCategoryXPath));
+        subCategoryElement.click();
+    }
+    public void navigateToCategory(String categoryName){
+        String categoryXPath = String.format(CATEGORY_XPATH_TEMPLATE, categoryName);
         Actions action = new Actions(driver);
-        action.moveToElement(womenCategory).perform();
-    }
-    public void navigateToTopsSubCategoryOfWomenCategory(){
-        topsSubCategoryOfWomenCategory.click();
-    }
-    public void navigateToBottomsSubCategoryOfWomenCategory(){
-        bottomsSubCategoryOfWomenCategory.click();
+        action.moveToElement(driver.findElement(By.xpath(categoryXPath))).perform();
     }
     public List<WebElement> getListOfProducts(){
         return listOfProducts;
@@ -103,14 +96,9 @@ public class HomePageAuthorizedUser extends BasePage{
     public void clickCartLink(){
         cartLink.click();
     }
-    public BigDecimal addProductToCartFromWomenCategory(String product, String subCategory) {
-        navigateToWomenCategory();
-
-        if(subCategory.equals("Tops")){
-            navigateToTopsSubCategoryOfWomenCategory();
-        } else if (subCategory.equals("Bottoms")) {
-            navigateToBottomsSubCategoryOfWomenCategory();
-        }
+    public BigDecimal addProductToCartFromWomenCategory(String productName, String categoryName, String subcategoryName) {
+        navigateToCategory(categoryName);
+        navigateToSubCategory(categoryName, subcategoryName);
 
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         BigDecimal totalPrice = BigDecimal.ZERO;
@@ -119,7 +107,7 @@ public class HomePageAuthorizedUser extends BasePage{
             try {
                 List<WebElement> productList = getListOfProducts();
                 for (WebElement productElement : productList) {
-                    if (getProductName(productElement).equals(product)) {
+                    if (getProductName(productElement).equals(productName)) {
                         selectFirstAvailableProductSize(productElement);
                         selectFirstAvailableProductColor(productElement);
 

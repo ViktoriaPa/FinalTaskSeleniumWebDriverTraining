@@ -22,7 +22,7 @@ public class TestAddingToCart extends BaseTest {
         HomePageUnauthorizedUser homePageUnauthorizedUser = new HomePageUnauthorizedUser(driver);
         AuthorizationPage authorizationPage = homePageUnauthorizedUser.openAuthorizationPage();
         HomePageAuthorizedUser homePageAuthorizedUser = authorizationPage.openHomePageAuthorizedUser(EMAIL, PASSWORD);
-        BigDecimal totalPriceAddedToChartProducts = homePageAuthorizedUser.addProductToCartFromWomenCategory("Miko Pullover Hoodie", "Tops");
+        BigDecimal totalPriceAddedToChartProducts = homePageAuthorizedUser.addProductToCartFromWomenCategory("Miko Pullover Hoodie", "Women", "Tops");
         CartPage cartPage = homePageAuthorizedUser.openCartPage();
 
         assertEquals(totalPriceAddedToChartProducts, cartPage.getTotalPriceFromCart(), "Prices mismatch");
