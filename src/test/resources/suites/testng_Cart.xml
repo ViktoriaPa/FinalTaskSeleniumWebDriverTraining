@@ -12,11 +12,5 @@
             <class name="com.coherentsolutions.training.auto.web.pashkovskaya.tests.TestAddingToCart"></class>
         </classes>
     </test>
-    <test name="AddingToCart_Firefox">
-        <parameter name="browser" value="firefox"/>
 
-        <classes>
-            <class name="com.coherentsolutions.training.auto.web.pashkovskaya.tests.TestAddingToCart"></class>
-        </classes>
-    </test>
 </suite>

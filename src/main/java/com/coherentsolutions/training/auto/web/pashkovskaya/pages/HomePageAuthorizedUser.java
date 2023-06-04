@@ -14,6 +14,13 @@ import java.util.concurrent.TimeUnit;
 public class HomePageAuthorizedUser extends BasePage{
     private static final String CATEGORY_XPATH_TEMPLATE = "//span[text()='%s']";
     private static final String SUB_CATEGORY_XPATH_TEMPLATE = "//ul[@id='ui-id-2']//a[span[contains(text(),'%s')]]/following-sibling::ul//a[span[contains(text(),'%s')]]";
+    private static final String PRODUCT_PRICE_XPATH_TEMPLATE = "/ancestor::div[contains(@class, 'product-item-details')]//span[@data-price-type='finalPrice']";
+    private static final String ADD_TO_CART_BUTTON_XPATH_TEMPLATE = "/ancestor::div[contains(@class, 'product-item-details')]//button[@title='Add to Cart']";
+    private static final String PRODUCT_XPATH_TEMPLATE = "//a[contains(text(), '%s')]";
+    private static final String PRODUCT_FIRST_AVAILABLE_COLOR_XPATH_TEMPLATE = "/ancestor::div[contains(@class, 'product-item-details')]//div[@attribute-code='color']/div/div[1]";
+    private static final String PRODUCT_FIRST_AVAILABLE_SIZE_XPATH_TEMPLATE = "/ancestor::div[contains(@class, 'product-item-details')]//div[@attribute-code='size']//div//div[1]";
+    private By nextButton = By.xpath("//div[@class='column main'] //div[4] //a[@title='Next']");
+
     @FindBy(xpath = "//div[@class='panel header'] //button[@data-action='customer-menu-toggle']")
     private WebElement loggedInUserMenu;
     @FindBy(linkText = "My Account")
@@ -32,13 +39,6 @@ public class HomePageAuthorizedUser extends BasePage{
     private WebElement addToWishListIcon;
     @FindBy(xpath = "//div[@class='columns']//div[contains(@class,'products-grid')]//li")
     private List<WebElement> listOfProducts;
-
-    private By nextButton = By.xpath("//div[@class='column main'] //div[4] //a[@title='Next']");
-    private By firstAvailableProductSize = By.xpath(".//div[@attribute-code='size']//div//div[1]");
-    private By firstAvailableProductColor = By.xpath(".//div[@attribute-code='color']/div/div[1]");
-    private By productName = By.xpath(".//a[@class='product-item-link']");
-    private By productPrice = By.xpath(".//span[@data-price-type='finalPrice']");
-    private By addToCartButton = By.xpath(".//button[@title='Add to Cart']");
 
     public HomePageAuthorizedUser(WebDriver driver) {
         super(driver);
@@ -69,23 +69,30 @@ public class HomePageAuthorizedUser extends BasePage{
     public List<WebElement> getListOfProducts(){
         return listOfProducts;
     }
-    public String getProductName(WebElement productElement){
-        return productElement.findElement(productName).getText();
+    public void selectFirstAvailableProductSize(String productName){
+        String productXPath = String.format(PRODUCT_XPATH_TEMPLATE, productName);
+        WebElement productSize = driver.findElement(By.xpath(productXPath + PRODUCT_FIRST_AVAILABLE_SIZE_XPATH_TEMPLATE));
+        productSize.click();
     }
-    public void selectFirstAvailableProductSize(WebElement productElement){
-        productElement.findElement(firstAvailableProductSize).click();
+    public void selectFirstAvailableProductColor(String productName){
+        String productXPath = String.format(PRODUCT_XPATH_TEMPLATE, productName);
+        WebElement productColor = driver.findElement(By.xpath(productXPath + PRODUCT_FIRST_AVAILABLE_COLOR_XPATH_TEMPLATE));
+        productColor.click();
     }
-    public void selectFirstAvailableProductColor(WebElement productElement){
-        productElement.findElement(firstAvailableProductColor).click();
-    }
-    public BigDecimal getProductPrice(WebElement productElement){
-        String price = productElement.findElement(productPrice).getText();
+    public BigDecimal getProductPrice(String productName){
+        String productXPath = String.format(PRODUCT_XPATH_TEMPLATE, productName);
+        WebElement productSize = driver.findElement(By.xpath(productXPath + PRODUCT_PRICE_XPATH_TEMPLATE));
+
+        String price = productSize.getText();
+        System.out.println(price);
 
         BigDecimal productPrice = new BigDecimal(price.replaceAll("[$]", ""));
         return productPrice;
     }
-    public void addProductToCart(WebElement productElement){
-        productElement.findElement(addToCartButton).click();
+    public void addProductToCart(String productName){
+        String productXPath = String.format(PRODUCT_XPATH_TEMPLATE, productName);
+        WebElement addProductToCartButton = driver.findElement(By.xpath(productXPath + ADD_TO_CART_BUTTON_XPATH_TEMPLATE));
+        addProductToCartButton.click();
     }
     public void clickCartIcon(){
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
@@ -105,24 +112,25 @@ public class HomePageAuthorizedUser extends BasePage{
 
         while (true) {
             try {
-                List<WebElement> productList = getListOfProducts();
-                for (WebElement productElement : productList) {
-                    if (getProductName(productElement).equals(productName)) {
-                        selectFirstAvailableProductSize(productElement);
-                        selectFirstAvailableProductColor(productElement);
+                if (driver.findElement(By.xpath(String.format(PRODUCT_XPATH_TEMPLATE, productName))).isDisplayed()){
+                    selectFirstAvailableProductSize(productName);
+                    selectFirstAvailableProductColor(productName);
 
-                        totalPrice = totalPrice.add(getProductPrice(productElement));
+                    totalPrice = totalPrice.add(getProductPrice(productName));
 
-                        addProductToCart(productElement);
-                    }
+                    addProductToCart(productName);
                 }
-                WebElement nextButtonForTable = wait.until(ExpectedConditions.presenceOfElementLocated(nextButton));
-                nextButtonForTable.click();
-                driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-            } catch (TimeoutException e) {
-                break;
+            } catch (NoSuchElementException f) {
+                try {
+                    WebElement nextButtonForTable = wait.until(ExpectedConditions.presenceOfElementLocated(nextButton));
+                    nextButtonForTable.click();
+                    driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+                } catch (TimeoutException q) {
+                    break;
+                }
             }
         }
+
         return totalPrice;
     }
     public void addToWishList(){
