@@ -39,7 +39,16 @@ public class HomePageAuthorizedUser extends BasePage{
     private WebElement addToWishListIcon;
     @FindBy(xpath = "//div[@class='columns']//div[contains(@class,'products-grid')]//li")
     private List<WebElement> listOfProducts;
+    @FindBy(id = "search")
+    private WebElement searchField;
+    @FindBy(xpath = "//button[@title='Search']")
+    private WebElement searchButton;
 
+    public void searchProduct(String productName) {
+        searchField.sendKeys(productName);
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        searchButton.click();
+    }
     public HomePageAuthorizedUser(WebDriver driver) {
         super(driver);
     }
@@ -103,7 +112,19 @@ public class HomePageAuthorizedUser extends BasePage{
     public void clickCartLink(){
         cartLink.click();
     }
-    public BigDecimal addProductToCartFromWomenCategory(String productName, String categoryName, String subcategoryName) {
+    public BigDecimal addProductToCartUsingSearch(String productName){
+        BigDecimal totalPrice = BigDecimal.ZERO;
+
+        searchProduct(productName);
+        driver.findElement(By.xpath(String.format(PRODUCT_XPATH_TEMPLATE, productName)));
+        selectFirstAvailableProductSize(productName);
+        selectFirstAvailableProductColor(productName);
+        totalPrice = totalPrice.add(getProductPrice(productName));
+        addProductToCart(productName);
+
+        return totalPrice;
+    }
+    public BigDecimal addProductToCartFromCategory(String productName, String categoryName, String subcategoryName) {
         navigateToCategory(categoryName);
         navigateToSubCategory(categoryName, subcategoryName);
 
