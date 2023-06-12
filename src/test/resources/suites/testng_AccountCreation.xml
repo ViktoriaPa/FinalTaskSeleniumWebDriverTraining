@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+
+<suite name="AccountCreation">
+    <listeners>
+        <listener class-name="com.coherentsolutions.training.auto.web.pashkovskaya.util.TestAllureListener"></listener>
+    </listeners>
+    <test name="AccountCreation_Chrome">
+        <parameter name="browser" value="chrome"/>
+
+        <classes>
+            <class name="com.coherentsolutions.training.auto.web.pashkovskaya.tests.TestAccountCreation"></class>
+        </classes>
+    </test>
+    <test name="AccountCreation_Firefox">
+        <parameter name="browser" value="firefox"/>
+
+        <classes>
+            <class name="com.coherentsolutions.training.auto.web.pashkovskaya.tests.TestAccountCreation"></class>
+        </classes>
+    </test>
+</suite>
